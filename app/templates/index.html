@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>โหราศาสตร์ไทย — ดวงสุริยยาตร์</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --surface: #111111;
+  --surface2: #1a1a1a;
+  --border: #242424;
+  --accent: #e8e8e8;
+  --accent2: #6366f1;
+  --text: #e8e8e8;
+  --muted: #555555;
+  --green: #4ade80;
+  --red: #f87171;
+  --orange: #fb923c;
+  --blue: #60a5fa;
+  --gold: #d4a843;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Sarabun', sans-serif;
+  font-weight: 400;
+  min-height: 100vh;
+}
+a { color: var(--accent2); }
+h1 { font-size: 1.1rem; font-weight: 600; color: var(--text); letter-spacing: -.01em; }
+h2 { font-size: .75rem; color: var(--muted); font-weight: 500; margin-bottom: 12px; text-transform: uppercase; letter-spacing: .08em; }
+
+/* ─── Layout ─────────────────────────────────────────── */
+.app { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+.sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 28px 22px;
+  display: flex; flex-direction: column; gap: 22px;
+}
+.main { padding: 28px 32px; overflow-y: auto; }
+
+/* ─── Form ───────────────────────────────────────────── */
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group label { font-size: .72rem; color: var(--muted); font-weight: 500; letter-spacing: .04em; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+input[type=date], input[type=time], input[type=number], input[type=text], select {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 8px 10px;
+  font-size: .88rem;
+  font-family: inherit;
+  width: 100%;
+  outline: none;
+  transition: border-color .15s;
+}
+input:focus, select:focus { border-color: var(--accent2); background: var(--surface); }
+.btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 11px;
+  font-size: .9rem;
+  font-family: inherit;
+  cursor: pointer;
+  width: 100%;
+  font-weight: 500;
+  letter-spacing: .01em;
+  transition: opacity .15s;
+}
+.btn:hover { opacity: .8; }
+.btn:disabled { opacity: .35; cursor: default; }
+.preset-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--muted);
+  padding: 4px 10px;
+  font-size: .73rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all .15s;
+}
+.preset-btn:hover { border-color: var(--accent); color: var(--accent); }
+.presets { display: flex; flex-wrap: wrap; gap: 5px; }
+
+/* ─── Chart Grid ─────────────────────────────────────── */
+.chart-section { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
+.chart-wrap { flex-shrink: 0; }
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 112px);
+  grid-template-rows: repeat(4, 88px);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.cell {
+  background: var(--surface);
+  padding: 7px 8px;
+  position: relative;
+  min-height: 88px;
+  transition: background .15s;
+}
+.cell:hover { background: var(--surface2); }
+.cell.lagna { background: #1a1500; }
+.cell.empty { background: var(--surface2); }
+.cell-no {
+  font-size: .6rem;
+  color: var(--border);
+  position: absolute;
+  top: 5px; right: 6px;
+}
+.cell-sign {
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.cell.lagna .cell-sign { color: var(--gold); }
+.cell-house {
+  font-size: .6rem;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.planet-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  border-radius: 3px;
+  padding: 1px 4px;
+  margin: 1px 1px 1px 0;
+  font-size: .7rem;
+  cursor: default;
+  color: var(--text);
+  position: relative;
+}
+.planet-chip::before {
+  content: '';
+  display: inline-block;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--muted);
+  flex-shrink: 0;
+}
+.planet-chip.pos-อุจจ::before       { background: var(--gold); }
+.planet-chip.pos-เกษตร::before      { background: var(--green); }
+.planet-chip.pos-ราชาโชค::before    { background: var(--blue); }
+.planet-chip.pos-มหาจักร::before    { background: var(--accent2); }
+.planet-chip.pos-อุจจาวิลาส::before { background: #16a34a; }
+.planet-chip.pos-ประเกษตร::before   { background: var(--orange); }
+.planet-chip.pos-นิจ::before        { background: var(--red); }
+
+/* ─── Tooltip ────────────────────────────────────────── */
+.tooltip {
+  display: none;
+  position: fixed;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  max-width: 240px;
+  font-size: .78rem;
+  line-height: 1.55;
+  z-index: 100;
+  pointer-events: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,.1);
+}
+.tooltip.show { display: block; }
+.tt-name { font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.tt-pos { font-size: .68rem; color: var(--muted); margin-bottom: 5px; }
+.tt-text { color: var(--text); }
+
+/* ─── Lagna banner ───────────────────────────────────── */
+.lagna-banner {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.lagna-banner .big { font-size: 1.6rem; font-weight: 600; color: var(--text); line-height: 1; }
+.lagna-banner .sub { font-size: .8rem; color: var(--muted); }
+
+/* ─── Planet table ───────────────────────────────────── */
+.planet-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .82rem;
+}
+.planet-table th {
+  text-align: left;
+  color: var(--muted);
+  font-weight: 500;
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--border);
+  font-size: .7rem;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.planet-table td {
+  padding: 8px 8px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.planet-table tr:last-child td { border-bottom: none; }
+.interp-text { color: var(--muted); font-size: .77rem; line-height: 1.5; margin-top: 2px; }
+.tag {
+  display: inline-block;
+  border-radius: 3px;
+  padding: 1px 6px;
+  font-size: .65rem;
+  font-weight: 600;
+  letter-spacing: .03em;
+}
+.tag.อุจจ       { background: #2a200a; color: var(--gold); }
+.tag.เกษตร      { background: #0a1f0f; color: var(--green); }
+.tag.ราชาโชค    { background: #0a1525; color: var(--blue); }
+.tag.มหาจักร    { background: #151030; color: #a5b4fc; }
+.tag.อุจจาวิลาส { background: #0f1f15; color: #86efac; }
+.tag.อุจจาภิมุข { background: #151f05; color: #bef264; }
+.tag.เทวีโชค    { background: #071520; color: #7dd3fc; }
+.tag.ประเกษตร   { background: #201005; color: var(--orange); }
+.tag.นิจ        { background: #200a0a; color: var(--red); }
+
+/* ─── Yoga cards ─────────────────────────────────────── */
+.yoga-list { display: flex; flex-direction: column; gap: 1px; margin-top: 4px; }
+.yoga-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  margin-bottom: 6px;
+}
+.yoga-card.good { border-left: 3px solid var(--green); }
+.yoga-card.warning { border-left: 3px solid var(--orange); }
+.yoga-name { font-weight: 600; font-size: .88rem; color: var(--text); margin-bottom: 2px; }
+.yoga-planets { font-size: .7rem; color: var(--muted); margin-bottom: 3px; }
+.yoga-desc { font-size: .8rem; line-height: 1.55; color: var(--muted); }
+
+/* ─── Dasha timeline ─────────────────────────────────── */
+.dasha-wrap { display: flex; flex-direction: column; gap: 2px; }
+.dasha-row {
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: .83rem;
+  transition: background .1s;
+  border: 1px solid transparent;
+}
+.dasha-row:hover { background: var(--surface); }
+.dasha-row.current { background: var(--surface); border-color: var(--border); }
+.dasha-head { display: flex; flex-direction: column; gap: 4px; }
+.dasha-top { display: flex; align-items: center; gap: 10px; }
+.dasha-planet { font-weight: 500; color: var(--text); min-width: 80px; }
+.dasha-row.current .dasha-planet { font-weight: 600; }
+.dasha-years { font-size: .75rem; color: var(--muted); flex: 1; }
+.dasha-kw {
+  font-size: .72rem;
+  color: var(--muted);
+  letter-spacing: .01em;
+}
+.dasha-row.current .dasha-kw { color: var(--accent2); }
+.dasha-desc {
+  font-size: .78rem;
+  color: var(--muted);
+  line-height: 1.55;
+  padding: 6px 0 4px;
+  border-top: 1px solid var(--border);
+  margin-top: 2px;
+}
+.dasha-bar-wrap { height: 2px; background: var(--border); border-radius: 2px; margin-top: 4px; }
+.dasha-bar { height: 100%; border-radius: 2px; background: var(--border); }
+.dasha-row.current .dasha-bar { background: var(--accent2); }
+.dasha-label {
+  font-size: .63rem;
+  color: var(--accent2);
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+.dasha-row.prebirth { opacity: .55; }
+.dasha-phase {
+  font-size: .63rem;
+  font-weight: 600;
+  letter-spacing: .03em;
+  white-space: nowrap;
+  opacity: .85;
+}
+
+/* ─── Section divider ────────────────────────────────── */
+.section { margin-top: 32px; }
+
+/* ─── Legend ─────────────────────────────────────────── */
+.legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; font-size: .68rem; color: var(--muted); }
+.leg { display: flex; align-items: center; gap: 4px; }
+.leg-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+/* ─── Placeholder ────────────────────────────────────── */
+.placeholder {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 10px; height: 300px;
+  color: var(--muted); text-align: center; font-size: .85rem;
+}
+.spinner {
+  width: 24px; height: 24px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin .6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ─── Sidebar ───────────────────────────────────────── -->
+<aside class="sidebar">
+  <div>
+    <h1>โหราศาสตร์ไทย</h1>
+    <div style="color:var(--muted);font-size:.7rem;margin-top:5px;letter-spacing:.02em;">สุริยยาตร์ · Lahiri Ayanamsa</div>
+  </div>
+
+  <div class="form-group">
+    <label>วันเกิด</label>
+    <input type="date" id="bdate" value="1990-01-01">
+  </div>
+
+  <div class="form-group">
+    <label>เวลาเกิด (นาฬิกา : นาที)</label>
+    <div class="form-row">
+      <input type="number" id="bhour" min="0" max="23" value="10" placeholder="ชม.">
+      <input type="number" id="bmin"  min="0" max="59" value="0"  placeholder="นาที">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>สถานที่เกิด</label>
+    <select id="preset" onchange="applyPreset(this.value)">
+      <option value="">— เลือกจังหวัด —</option>
+      <option value="13.7563,100.5018">กรุงเทพมหานคร</option>
+      <option value="8.0863,98.9063">กระบี่</option>
+      <option value="14.0023,99.5328">กาญจนบุรี</option>
+      <option value="16.4314,103.5059">กาฬสินธุ์</option>
+      <option value="16.4828,99.5226">กำแพงเพชร</option>
+      <option value="16.4419,102.8360">ขอนแก่น</option>
+      <option value="12.6109,102.1039">จันทบุรี</option>
+      <option value="13.6904,101.0779">ฉะเชิงเทรา</option>
+      <option value="13.3611,100.9847">ชลบุรี</option>
+      <option value="15.1851,100.1280">ชัยนาท</option>
+      <option value="15.8068,102.0318">ชัยภูมิ</option>
+      <option value="10.4930,99.1800">ชุมพร</option>
+      <option value="19.9105,99.8405">เชียงราย</option>
+      <option value="18.7883,98.9853">เชียงใหม่</option>
+      <option value="7.5593,99.6119">ตรัง</option>
+      <option value="12.2428,102.5175">ตราด</option>
+      <option value="16.8840,99.1258">ตาก</option>
+      <option value="14.2069,101.2130">นครนายก</option>
+      <option value="13.8199,100.0624">นครปฐม</option>
+      <option value="17.3920,104.7697">นครพนม</option>
+      <option value="14.9799,102.0977">นครราชสีมา</option>
+      <option value="8.4322,99.9633">นครศรีธรรมราช</option>
+      <option value="15.6987,100.1199">นครสวรรค์</option>
+      <option value="13.8621,100.5144">นนทบุรี</option>
+      <option value="6.4255,101.8253">นราธิวาส</option>
+      <option value="18.7929,100.7792">น่าน</option>
+      <option value="18.3609,103.6461">บึงกาฬ</option>
+      <option value="14.9949,103.1029">บุรีรัมย์</option>
+      <option value="14.0208,100.5250">ปทุมธานี</option>
+      <option value="11.8126,99.7976">ประจวบคีรีขันธ์</option>
+      <option value="14.0509,101.3701">ปราจีนบุรี</option>
+      <option value="6.8692,101.2503">ปัตตานี</option>
+      <option value="14.3692,100.5877">พระนครศรีอยุธยา</option>
+      <option value="19.1663,99.9032">พะเยา</option>
+      <option value="8.4509,98.5247">พังงา</option>
+      <option value="7.6166,100.0740">พัทลุง</option>
+      <option value="16.4426,100.3480">พิจิตร</option>
+      <option value="16.8211,100.2659">พิษณุโลก</option>
+      <option value="13.1120,99.9399">เพชรบุรี</option>
+      <option value="16.4189,101.1586">เพชรบูรณ์</option>
+      <option value="18.1452,100.1402">แพร่</option>
+      <option value="7.8804,98.3923">ภูเก็ต</option>
+      <option value="16.1851,103.2946">มหาสารคาม</option>
+      <option value="16.5422,104.7236">มุกดาหาร</option>
+      <option value="19.2986,97.9709">แม่ฮ่องสอน</option>
+      <option value="15.7927,104.1459">ยโสธร</option>
+      <option value="6.5406,101.2797">ยะลา</option>
+      <option value="9.9528,98.6084">ระนอง</option>
+      <option value="12.6814,101.2816">ระยอง</option>
+      <option value="13.5364,99.8173">ราชบุรี</option>
+      <option value="16.0541,103.6520">ร้อยเอ็ด</option>
+      <option value="14.7995,100.6534">ลพบุรี</option>
+      <option value="18.2888,99.4927">ลำปาง</option>
+      <option value="18.5744,99.0087">ลำพูน</option>
+      <option value="17.4864,101.7226">เลย</option>
+      <option value="15.1186,104.3220">ศรีสะเกษ</option>
+      <option value="17.1559,104.1345">สกลนคร</option>
+      <option value="7.1756,100.6137">สงขลา</option>
+      <option value="6.6238,100.0674">สตูล</option>
+      <option value="13.5991,100.5998">สมุทรปราการ</option>
+      <option value="13.4098,100.0022">สมุทรสงคราม</option>
+      <option value="13.5475,100.2747">สมุทรสาคร</option>
+      <option value="13.8218,102.0645">สระแก้ว</option>
+      <option value="14.5289,100.9100">สระบุรี</option>
+      <option value="14.8933,100.3970">สิงห์บุรี</option>
+      <option value="17.0068,99.8265">สุโขทัย</option>
+      <option value="14.4744,100.1178">สุพรรณบุรี</option>
+      <option value="9.1382,99.3219">สุราษฎร์ธานี</option>
+      <option value="14.8821,103.4936">สุรินทร์</option>
+      <option value="17.8782,102.7419">หนองคาย</option>
+      <option value="17.2086,102.4409">หนองบัวลำภู</option>
+      <option value="14.5896,100.4550">อ่างทอง</option>
+      <option value="15.8656,104.6250">อำนาจเจริญ</option>
+      <option value="17.4138,102.7870">อุดรธานี</option>
+      <option value="17.6200,100.0993">อุตรดิตถ์</option>
+      <option value="15.3800,100.0249">อุทัยธานี</option>
+      <option value="15.2284,104.8572">อุบลราชธานี</option>
+    </select>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label>ละติจูด</label>
+      <input type="number" id="lat" step="0.01" value="13.75">
+    </div>
+    <div class="form-group">
+      <label>ลองจิจูด</label>
+      <input type="number" id="lon" step="0.01" value="100.50">
+    </div>
+  </div>
+
+  <button class="btn" id="calcBtn" onclick="calculate()">คำนวณดวง</button>
+
+  <div>
+    <div style="font-size:.72rem;color:var(--muted);margin-bottom:6px;">ตัวอย่างบุคคลสาธารณะ</div>
+    <div class="presets">
+      <button class="preset-btn" onclick="setPreset('1950-01-08','10:00','13.75','100.5')">ตัวอย่าง ก</button>
+      <button class="preset-btn" onclick="setPreset('1975-06-15','14:30','13.75','100.5')">ตัวอย่าง ข</button>
+      <button class="preset-btn" onclick="setPreset('1982-11-23','07:15','13.75','100.5')">ตัวอย่าง ค</button>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="leg"><div class="leg-dot" style="background:var(--gold)"></div> อุจจ</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--green)"></div> เกษตร</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--accent2)"></div> มหาจักร</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--blue)"></div> ราชาโชค</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--orange)"></div> ประเกษตร</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--red)"></div> นิจ</div>
+  </div>
+</aside>
+
+<!-- ─── Main ──────────────────────────────────────────── -->
+<main class="main">
+  <div id="output">
+    <div class="placeholder">
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+        <circle cx="32" cy="32" r="28" stroke="#7c6ff7" stroke-width="2"/>
+        <circle cx="32" cy="32" r="4" fill="#7c6ff7"/>
+        <line x1="32" y1="4" x2="32" y2="18" stroke="#7c6ff7" stroke-width="2"/>
+        <line x1="32" y1="46" x2="32" y2="60" stroke="#7c6ff7" stroke-width="2"/>
+        <line x1="4" y1="32" x2="18" y2="32" stroke="#7c6ff7" stroke-width="2"/>
+        <line x1="46" y1="32" x2="60" y2="32" stroke="#7c6ff7" stroke-width="2"/>
+        <line x1="12" y1="12" x2="22" y2="22" stroke="#7c6ff7" stroke-width="1.5"/>
+        <line x1="42" y1="42" x2="52" y2="52" stroke="#7c6ff7" stroke-width="1.5"/>
+      </svg>
+      <div>กรอกข้อมูลเกิดและกด คำนวณดวง</div>
+    </div>
+  </div>
+</main>
+</div>
+
+<!-- Tooltip -->
+<div class="tooltip" id="tooltip">
+  <div class="tt-name" id="tt-name"></div>
+  <div class="tt-pos" id="tt-pos"></div>
+  <div class="tt-text" id="tt-text"></div>
+</div>
+
+<script>
+// ─── South Indian chart grid positions (sign 1–12)
+// grid is 4×4; center 4 cells = blank
+const GRID = {
+  12:{r:0,c:0}, 1:{r:0,c:1}, 2:{r:0,c:2},  3:{r:0,c:3},
+  11:{r:1,c:0},                               4:{r:1,c:3},
+  10:{r:2,c:0},                               5:{r:2,c:3},
+   9:{r:3,c:0}, 8:{r:3,c:1}, 7:{r:3,c:2},   6:{r:3,c:3},
+};
+
+const PLANET_SYM = {1:"☉",2:"☽",3:"♂",4:"☿",5:"♃",6:"♀",7:"♄",8:"ร",9:"ก",0:"♅"};
+const HOUSE_TH = ["","ตนุ","กดุมภะ","สหัชชะ","พันธุ","ปุตตะ","อริ","ปัตนิ","มรณะ","ศุภะ","กัมมะ","ลาภะ","วินาศ"];
+
+function applyPreset(val) {
+  if(!val) return;
+  const [la, lo] = val.split(",");
+  document.getElementById("lat").value = la;
+  document.getElementById("lon").value = lo;
+}
+
+function setPreset(dateStr, timeStr, lat, lon) {
+  document.getElementById("bdate").value = dateStr;
+  const [h, m] = timeStr.split(":");
+  document.getElementById("bhour").value = h;
+  document.getElementById("bmin").value  = m;
+  document.getElementById("lat").value   = lat;
+  document.getElementById("lon").value   = lon;
+}
+
+function posClass(positions) {
+  const rank = ["อุจจ","เกษตร","มหาจักร","ราชาโชค","อุจจาวิลาส","อุจจาภิมุข","เทวีโชค","ตรียางค์","ประเกษตร","นิจ"];
+  for(const r of rank) if(positions.includes(r)) return r;
+  return "";
+}
+
+async function calculate() {
+  const btn = document.getElementById("calcBtn");
+  btn.disabled = true;
+  document.getElementById("output").innerHTML = `<div style="padding:60px;text-align:center"><div class="spinner"></div><div style="color:var(--muted);margin-top:12px;font-size:.85rem">กำลังคำนวณ…</div></div>`;
+
+  const dateVal = document.getElementById("bdate").value;
+  if(!dateVal){ alert("กรุณากรอกวันเกิด"); btn.disabled=false; return; }
+  const [year, month, day] = dateVal.split("-").map(Number);
+
+  const body = {
+    year, month, day,
+    hour:   parseInt(document.getElementById("bhour").value)||0,
+    minute: parseInt(document.getElementById("bmin").value)||0,
+    lat:    parseFloat(document.getElementById("lat").value)||13.75,
+    lon:    parseFloat(document.getElementById("lon").value)||100.5,
+    tz:     7.0,  // ไทย UTC+7 ตลอด (ไม่มี DST)
+  };
+
+  try {
+    const res = await fetch("/api/chart", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify(body)
+    });
+    if(!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    renderChart(data, body);
+  } catch(e) {
+    document.getElementById("output").innerHTML = `<div style="color:var(--red);padding:20px">เกิดข้อผิดพลาด: ${e.message}</div>`;
+  }
+  btn.disabled = false;
+}
+
+function renderChart(data, inp) {
+  const lagna = data.lagna;
+  const sm    = data.sign_map;
+  const planets = data.planets;
+
+  // ─── Build grid HTML
+  const cells = Array.from({length:4}, ()=>Array(4).fill(null));
+  for(const [sign, info] of Object.entries(sm)){
+    const s = parseInt(sign);
+    const g = GRID[s];
+    if(!g) continue;
+    cells[g.r][g.c] = {sign:s, ...info};
+  }
+  // Center cells
+  [[1,1],[1,2],[2,1],[2,2]].forEach(([r,c])=>{ cells[r][c]={empty:true}; });
+
+  let gridHtml = "";
+  for(let r=0;r<4;r++){
+    for(let c=0;c<4;c++){
+      const cell = cells[r][c];
+      if(!cell){ gridHtml += `<div class="cell empty"></div>`; continue; }
+      if(cell.empty){
+        // center: show birth info
+        if(r===1&&c===1){
+          gridHtml += `<div class="cell" style="grid-column:2/4;grid-row:2/4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:var(--surface2);border-color:var(--border)">
+            <div style="color:var(--accent);font-size:1.05rem;font-weight:700;">ลัคนา</div>
+            <div style="font-size:1.2rem;font-weight:700;color:#fff;">${lagna.sign_th}</div>
+            <div style="font-size:.72rem;color:var(--muted)">${lagna.degree}° ${lagna.element}</div>
+            <div style="font-size:.68rem;color:var(--muted);margin-top:4px">${inp.year}/${String(inp.month).padStart(2,'0')}/${String(inp.day).padStart(2,'0')}</div>
+            <div style="font-size:.68rem;color:var(--muted)">${String(inp.hour).padStart(2,'0')}:${String(inp.minute||0).padStart(2,'0')} น.</div>
+          </div>`;
+        }
+        continue;
+      }
+      const isLagna = cell.is_lagna;
+      const planetHtml = (cell.planets||[]).map(p=>{
+        const cls = posClass(p.positions||[]);
+        const interp = p.interp_house?.short || "";
+        const posTag = p.positions.length ? p.positions.join(", ") : "";
+        const attr = `data-pid="${p.planet_id}" data-name="${p.planet_th}" data-sign="${p.sign_th}" data-deg="${p.degree}" data-house="${p.house_no}" data-pos="${posTag}" data-interp="${interp}"`;
+        return `<span class="planet-chip${cls?' pos-'+cls:''}" ${attr} onmouseenter="showTip(event,this)" onmouseleave="hideTip()">${PLANET_SYM[p.planet_id]||''}${p.planet_th.charAt(0)}</span>`;
+      }).join("");
+
+      gridHtml += `<div class="cell${isLagna?' lagna':''}">
+        <span class="cell-no">${cell.sign}</span>
+        <div class="cell-sign">${cell.sign_th}</div>
+        <div class="cell-house">ภพ${cell.house_no} ${HOUSE_TH[cell.house_no]||''}</div>
+        <div>${planetHtml}</div>
+      </div>`;
+    }
+  }
+
+  // ─── Planet table
+  const tableRows = planets.map(p=>{
+    const posTags = (p.positions||[]).map(pos=>`<span class="tag ${pos}">${pos}</span>`).join(" ");
+    const interp  = p.interp_house?.short || "";
+    const interpP = p.interp_position?.short || "";
+    return `<tr>
+      <td style="white-space:nowrap">
+        <span style="font-size:1.1rem">${PLANET_SYM[p.planet_id]||''}</span>
+        <span style="margin-left:4px">${p.planet_th}</span>
+      </td>
+      <td style="color:var(--accent)">${p.sign_th} ${p.degree}°</td>
+      <td style="color:var(--muted)">ภพ${p.house_no} ${p.house_th}</td>
+      <td>${posTags||'<span style="color:var(--border)">—</span>'}</td>
+      <td>
+        <div>${interp}</div>
+        ${interpP?`<div class="interp-text">${interpP}</div>`:''}
+      </td>
+    </tr>`;
+  }).join("");
+
+  // ─── Yoga HTML
+  const yogaHtml = (data.yogas||[]).length === 0
+    ? `<div style="color:var(--muted);font-size:.82rem">ไม่พบโยคพิเศษในดวงนี้</div>`
+    : (data.yogas||[]).map(y => `
+        <div class="yoga-card ${y.level||'good'}">
+          <div class="yoga-name">${y.name}</div>
+          <div class="yoga-planets">${y.planets_th.join(" · ")}</div>
+          <div class="yoga-desc">${y.desc}</div>
+        </div>`).join("");
+
+  // ─── Dasha HTML
+  const DASHA_MEANINGS = {
+    1: { kw: "อำนาจ · อาชีพ · ชื่อเสียง", color: "#d97706",
+         desc: "ช่วงแห่งการสร้างตัวตนและเกียรติยศ บุคลิกภาพโดดเด่น เหมาะก้าวสู่ตำแหน่งผู้นำหรืองานราชการ ความสัมพันธ์กับบิดาและผู้มีอำนาจมีผลต่อชีวิต ระวังความเย่อหยิ่งและความขัดแย้งกับผู้ใหญ่" },
+    2: { kw: "จิตใจ · บ้าน · ความผันผวน", color: "#6366f1",
+         desc: "ช่วงชีวิตที่ขึ้นลงตามอารมณ์และสภาพแวดล้อม ความสัมพันธ์กับมารดาและครอบครัวส่งผลมาก อาจมีการย้ายที่อยู่หรือเดินทางบ่อย มีเสน่ห์ดึงดูดคนรอบข้าง เหมาะทำงานเกี่ยวกับสาธารณชน" },
+    3: { kw: "พลังงาน · การลงมือ · ความกล้า", color: "#dc2626",
+         desc: "ช่วงแห่งความมุ่งมั่นและการลงมือทำ มีพลังงานสูง กล้าเผชิญความท้าทาย เหมาะสร้างธุรกิจ ซื้ออสังหาริมทรัพย์ หรืองานที่ต้องใช้ความกล้า ระวังอุบัติเหตุ การทะเลาะวิวาท และการตัดสินใจเร็วเกินไป" },
+    4: { kw: "ปัญญา · การสื่อสาร · ธุรกิจ", color: "#16a34a",
+         desc: "ช่วงแห่งการเรียนรู้และการสื่อสาร สติปัญญาแหลมคม ธุรกิจการค้าเจริญรุ่งเรือง เหมาะทำงานเขียน พูด สอน หรือเทคโนโลยี อาจมีพี่น้องหรือญาติช่วยเหลือ ระวังความไม่มั่นคงและการเปลี่ยนใจบ่อย" },
+    5: { kw: "โชค · ปัญญา · การขยายตัว", color: "#d97706",
+         desc: "ช่วงทองของชีวิต โชคดีรอบด้าน ปัญญาและคุณธรรมเจริญงอกงาม เหมาะแต่งงาน มีบุตร ขยายกิจการ หรือศึกษาระดับสูง อาจได้พบครูบาอาจารย์ผู้ทรงคุณธรรม ชีวิตจิตใจสงบสุข" },
+    6: { kw: "ความรัก · ความงาม · ทรัพย์สมบัติ", color: "#ec4899",
+         desc: "ช่วงที่ชีวิตเต็มไปด้วยความสุขและความงดงาม ความรักและชีวิตคู่ราบรื่น ทรัพย์สินงอกเงย มีเสน่ห์สูง ชอบศิลปะ ดนตรี ความงาม เหมาะทำงานสร้างสรรค์หรืองานที่เกี่ยวกับความงามและบันเทิง" },
+    7: { kw: "วินัย · ความพากเพียร · กรรม", color: "#7c3aed",
+         desc: "ช่วงแห่งการสะสมประสบการณ์และชำระกรรม อาจเผชิญอุปสรรคและความล่าช้า แต่ทุกอย่างสร้างความมั่นคงระยะยาว ผลตอบแทนช้าแต่ยั่งยืน ควรทำงานด้วยความตั้งใจและอดทน หลีกเลี่ยงทางลัดที่ผิด" },
+    8: { kw: "โอกาสใหม่ · ความเปลี่ยนแปลง · ต่างแดน", color: "#0891b2",
+         desc: "ช่วงแห่งการเปลี่ยนแปลงขนาดใหญ่และโอกาสไม่คาดฝัน อาจมีความสำเร็จก้าวกระโดดหรือผลพลิกผันจากภายนอก สนใจเรื่องต่างชาติ เทคโนโลยี หรือแนวทางแปลกใหม่ ระวังภาพลวงตาและการโกหกหลอกลวง" },
+    9: { kw: "จิตวิญญาณ · ปล่อยวาง · ปัญญาภายใน", color: "#65a30d",
+         desc: "ช่วงแห่งการหันเข้าสู่ภายใน สนใจธรรมะ ศาสนา และความหลุดพ้น อาจรู้สึกโดดเดี่ยวหรือถอยห่างจากโลกภายนอก แต่จะได้รับปัญญาและความสงบอย่างลึกซึ้ง เหมาะทำบุญ ปฏิบัติธรรม และปล่อยวางสิ่งที่ผ่านมา" },
+  };
+
+  function lifePhase(ageAtStart, ageAtEnd) {
+    const mid = (ageAtStart + ageAtEnd) / 2;
+    if (mid < 0)   return null;
+    if (mid < 6)   return { label: "วัยทารก",    color: "#94a3b8" };
+    if (mid < 13)  return { label: "วัยเด็ก",     color: "#60a5fa" };
+    if (mid < 18)  return { label: "วัยรุ่น",     color: "#a78bfa" };
+    if (mid < 28)  return { label: "วัยหนุ่มสาว", color: "#34d399" };
+    if (mid < 45)  return { label: "วัยทำงาน",    color: "#fbbf24" };
+    if (mid < 60)  return { label: "วัยกลางคน",   color: "#fb923c" };
+    return              { label: "วัยสูงอายุ",   color: "#94a3b8" };
+  }
+
+  const birthCE = inp.year;
+  const dashaObj = data.dasha || {};
+  const periods  = dashaObj.periods || [];
+  const maxYears = 20;
+  const dashaRows = periods.map(p => {
+    const m = DASHA_MEANINGS[p.planet_id] || {};
+    const barPct = Math.min(100, (p.years / maxYears) * 100);
+    const ageStart = (p.start_thai - 543) - birthCE;
+    const ageEnd   = (p.end_thai   - 543) - birthCE;
+    const isPreBirth = ageStart < 0 && ageEnd <= 1;
+    const phase    = isPreBirth ? null : lifePhase(ageStart, ageEnd);
+    let ageLabel;
+    if (isPreBirth) {
+      const monthsLeft = Math.round(ageEnd * 12);
+      ageLabel = monthsLeft > 0
+        ? `(เศษ ${monthsLeft} เดือนหลังเกิด)`
+        : `(เศษก่อนเกิด)`;
+    } else if (ageStart < 0) {
+      ageLabel = `(อายุ 0–${Math.round(ageEnd)} ปี)`;
+    } else {
+      ageLabel = `(อายุ ${Math.round(ageStart)}–${Math.round(ageEnd)} ปี)`;
+    }
+    const currentMark = p.is_current
+      ? `<span class="dasha-label">ปัจจุบัน</span>` : "";
+    const seshMark = isPreBirth
+      ? `<span class="dasha-label" style="color:var(--muted)">เศษทศา</span>` : "";
+    const accentColor = m.color || 'var(--muted)';
+    return `<div class="dasha-row${p.is_current?' current':''}${isPreBirth?' prebirth':''}">
+      <div class="dasha-head">
+        <div class="dasha-top">
+          <span class="dasha-planet" style="color:${isPreBirth ? 'var(--muted)' : accentColor}">${p.symbol} ${p.planet_th}</span>
+          <span class="dasha-years">${p.start_thai}–${p.end_thai} ${ageLabel}</span>
+          ${phase ? `<span class="dasha-phase" style="color:${phase.color}">${phase.label}</span>` : ''}
+          ${seshMark}${currentMark}
+        </div>
+        ${m.kw ? `<div class="dasha-kw" style="color:${accentColor}88">${m.kw}</div>` : ''}
+        ${m.desc ? `<div class="dasha-desc">${m.desc}</div>` : ''}
+        <div class="dasha-bar-wrap"><div class="dasha-bar" style="width:${barPct}%;background:${accentColor}"></div></div>
+      </div>
+    </div>`;
+  }).join("");
+
+  // ─── Chart ruler
+  const ruler = data.chart_ruler || {};
+
+  document.getElementById("output").innerHTML = `
+    <div class="lagna-banner">
+      <div>
+        <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">ลัคนา</div>
+        <span class="big">ราศี${lagna.sign_th}</span>
+        <span class="sub" style="margin-left:8px">${lagna.degree}° · ธาตุ${lagna.element}</span>
+      </div>
+      <div style="margin-left:auto;text-align:right">
+        <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">เจ้าชะตา</div>
+        <span style="font-size:1rem;font-weight:600">${ruler.symbol||''} ${ruler.planet_th||''}</span>
+      </div>
+    </div>
+
+    <div class="chart-section">
+      <div class="chart-wrap">
+        <h2>ดวงชะตา</h2>
+        <div class="chart-grid" id="theGrid">${gridHtml}</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>โยค</h2>
+      <div class="yoga-list">${yogaHtml}</div>
+    </div>
+
+    <div class="section">
+      <h2>มหาทศา</h2>
+      <div class="dasha-wrap">${dashaRows}</div>
+    </div>
+
+    <div class="section">
+      <h2>ดาวทุกดวง</h2>
+      <table class="planet-table">
+        <thead><tr>
+          <th>ดาว</th><th>ราศี / องศา</th><th>ภพ</th><th>ตำแหน่ง</th><th>คำทำนาย (ภพ)</th>
+        </tr></thead>
+        <tbody>${tableRows}</tbody>
+      </table>
+    </div>
+  `;
+
+  // fix center span
+  const grid = document.getElementById("theGrid");
+  if(grid){
+    grid.style.gridTemplateRows = "repeat(4, 90px)";
+  }
+}
+
+function showTip(e, el) {
+  const tip = document.getElementById("tooltip");
+  document.getElementById("tt-name").textContent = el.dataset.name + " ในราศี" + el.dataset.sign + " " + el.dataset.deg + "° | ภพ" + el.dataset.house;
+  document.getElementById("tt-pos").textContent  = el.dataset.pos || "ไม่มีตำแหน่งพิเศษ";
+  document.getElementById("tt-text").textContent = el.dataset.interp || "";
+  tip.style.left = (e.clientX + 14) + "px";
+  tip.style.top  = (e.clientY - 10) + "px";
+  tip.classList.add("show");
+}
+function hideTip() {
+  document.getElementById("tooltip").classList.remove("show");
+}
+document.addEventListener("mousemove", e=>{
+  const tip = document.getElementById("tooltip");
+  if(tip.classList.contains("show")){
+    tip.style.left = (e.clientX+14)+"px";
+    tip.style.top  = (e.clientY-10)+"px";
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+[
+  {"id": 1, "th": "อาทิตย์", "en": "Sun",     "swe": 0},
+  {"id": 2, "th": "จันทร์",  "en": "Moon",    "swe": 1},
+  {"id": 3, "th": "อังคาร",  "en": "Mars",    "swe": 4},
+  {"id": 4, "th": "พุธ",     "en": "Mercury", "swe": 2},
+  {"id": 5, "th": "พฤหัสบดี","en": "Jupiter", "swe": 5},
+  {"id": 6, "th": "ศุกร์",   "en": "Venus",   "swe": 3},
+  {"id": 7, "th": "เสาร์",   "en": "Saturn",  "swe": 6},
+  {"id": 8, "th": "ราหู",    "en": "Rahu",    "swe": 11},
+  {"id": 9, "th": "เกตุ",    "en": "Ketu",    "swe": null, "note": "= ราหู + 180°"},
+  {"id": 0, "th": "มฤตยู",   "en": "Uranus",  "swe": 7}
+]

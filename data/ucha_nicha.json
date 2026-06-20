@@ -1,0 +1,11 @@
+[
+  {"planet": 1, "ucha": 1,  "ucha_deg": 19, "nicha": 7,  "nicha_deg": 19, "note": ""},
+  {"planet": 2, "ucha": 2,  "ucha_deg": 3,  "nicha": 8,  "nicha_deg": 3,  "note": ""},
+  {"planet": 3, "ucha": 10, "ucha_deg": 28, "nicha": 4,  "nicha_deg": 28, "note": ""},
+  {"planet": 4, "ucha": 6,  "ucha_deg": 15, "nicha": 12, "nicha_deg": 15, "note": "Mercury อุจจ+เกษตร ในกันย์"},
+  {"planet": 5, "ucha": 4,  "ucha_deg": 15, "nicha": 10, "nicha_deg": 15, "note": ""},
+  {"planet": 6, "ucha": 12, "ucha_deg": 27, "nicha": 6,  "nicha_deg": 27, "note": ""},
+  {"planet": 7, "ucha": 7,  "ucha_deg": 21, "nicha": 1,  "nicha_deg": 21, "note": ""},
+  {"planet": 8, "ucha": 8,  "ucha_deg": 20, "nicha": 2,  "nicha_deg": 20,
+   "note": "ราหู อุจจ=พิจิก / นิจ=พฤษภ — บางสำนักใช้ เมถุน/ธนู แทน ต้องระบุ"}
+]

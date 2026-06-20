@@ -1,0 +1,15 @@
+[
+  {"no": 1,  "th": "เมษ",   "en": "Aries",       "element": "ไฟ",  "ruler": 3},
+  {"no": 2,  "th": "พฤษภ",  "en": "Taurus",      "element": "ดิน", "ruler": 6},
+  {"no": 3,  "th": "เมถุน", "en": "Gemini",      "element": "ลม",  "ruler": 4},
+  {"no": 4,  "th": "กรกฎ",  "en": "Cancer",      "element": "น้ำ", "ruler": 2},
+  {"no": 5,  "th": "สิงห์", "en": "Leo",         "element": "ไฟ",  "ruler": 1},
+  {"no": 6,  "th": "กันย์", "en": "Virgo",       "element": "ดิน", "ruler": 4},
+  {"no": 7,  "th": "ตุล",   "en": "Libra",       "element": "ลม",  "ruler": 6},
+  {"no": 8,  "th": "พิจิก", "en": "Scorpio",     "element": "น้ำ", "ruler": 3},
+  {"no": 9,  "th": "ธนู",   "en": "Sagittarius", "element": "ไฟ",  "ruler": 5},
+  {"no": 10, "th": "มังกร", "en": "Capricorn",   "element": "ดิน", "ruler": 7},
+  {"no": 11, "th": "กุมภ์", "en": "Aquarius",    "element": "ลม",  "ruler": 7, "co_ruler": 8,
+   "note": "เสาร์=ruler หลัก; ราหู=co-ruler (แล้วแต่สำนัก)"},
+  {"no": 12, "th": "มีน",   "en": "Pisces",      "element": "น้ำ", "ruler": 5}
+]

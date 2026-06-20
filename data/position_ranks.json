@@ -1,0 +1,75 @@
+[
+  {
+    "key": "อุจจ",
+    "rank": 1,
+    "label_th": "อุจจ (มหาอุจจ)",
+    "label_en": "Exaltation",
+    "strength": "สูงสุด — ดาวมีอำนาจเต็ม",
+    "note": "บางสำนักนับ เกษตร > อุจจ เพราะ 'เกษตร = บ้าน = สม่ำเสมอ'"
+  },
+  {
+    "key": "เกษตร",
+    "rank": 2,
+    "label_th": "เกษตร",
+    "label_en": "Domicile / Own Sign",
+    "strength": "แข็งแกร่ง สม่ำเสมอ"
+  },
+  {
+    "key": "มหาจักร",
+    "rank": 3,
+    "label_th": "มหาจักร",
+    "label_en": "Great Cycle",
+    "strength": "มหามงคล — ความเจริญรุ่งเรือง"
+  },
+  {
+    "key": "ราชาโชค",
+    "rank": 4,
+    "label_th": "ราชาโชค",
+    "label_en": "Royal Fortune",
+    "strength": "อำนาจและความมั่งคั่ง"
+  },
+  {
+    "key": "อุจจาวิลาส",
+    "rank": 5,
+    "label_th": "อุจจาวิลาส",
+    "label_en": "Pre-Exaltation",
+    "strength": "กำลังขึ้นสู่จุดสูงสุด — ดีมาก",
+    "note": "ราศีถัดก่อน อุจจ (ดาวกำลังไต่ขึ้น)"
+  },
+  {
+    "key": "อุจจาภิมุข",
+    "rank": 6,
+    "label_th": "อุจจาภิมุข",
+    "label_en": "Post-Exaltation",
+    "strength": "ลงจากจุดสูงสุดแล้ว — ยังดีอยู่",
+    "note": "ราศีถัดหลัง อุจจ (ดาวกำลังลง)"
+  },
+  {
+    "key": "เทวีโชค",
+    "rank": 7,
+    "label_th": "เทวีโชค",
+    "label_en": "Divine Fortune",
+    "strength": "ราชาโชคน้อย — ตรงข้ามราชาโชค"
+  },
+  {
+    "key": "ตรียางค์",
+    "rank": 8,
+    "label_th": "ตรียางค์",
+    "label_en": "Triplicity / Decan",
+    "strength": "กลาง — ราศีธาตุเดียวกัน"
+  },
+  {
+    "key": "ประเกษตร",
+    "rank": 9,
+    "label_th": "ประเกษตร",
+    "label_en": "Detriment",
+    "strength": "อ่อน — ราศีตรงข้ามเกษตร"
+  },
+  {
+    "key": "นิจ",
+    "rank": 10,
+    "label_th": "นิจ",
+    "label_en": "Debilitation / Fall",
+    "strength": "ต่ำสุด — ดาวอ่อนกำลัง"
+  }
+]
