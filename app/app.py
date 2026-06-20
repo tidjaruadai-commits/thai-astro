@@ -91,6 +91,38 @@ def api_chart():
             "current_idx": current_idx,
         }
 
+    # ── ดาวย้าย (Transits วันนี้)
+    birth_moon_sign = moon.sign_no if moon else lagna_sign
+    today_chart = compute_chart(2026, 6, 20, 12.0, lat, lon, tz_hours=tz)
+    transit_planets = []
+    for pid, tpos in sorted(today_chart.planets.items()):
+        house_from_lagna = ((tpos.sign_no - lagna_sign) % 12) + 1
+        house_from_moon  = ((tpos.sign_no - birth_moon_sign) % 12) + 1
+        tags = []
+        if pid == 7 and house_from_moon in [12, 1, 2]:
+            tags.append("เสาร์คร่อมจันทร์")
+        if pid == 5 and house_from_moon in [1, 5, 9, 11]:
+            tags.append("พฤหัสเมตตา")
+        if pid == 8 and birth_moon_sign == tpos.sign_no:
+            tags.append("ราหูคร่อมจันทร์")
+        if pid == 9 and birth_moon_sign == tpos.sign_no:
+            tags.append("เกตุคร่อมจันทร์")
+        transit_planets.append({
+            "planet_id":        pid,
+            "planet_th":        PLANET_TH.get(pid, ""),
+            "symbol":           PLANET_SYM.get(pid, ""),
+            "sign_no":          tpos.sign_no,
+            "sign_th":          SIGN_NAMES[tpos.sign_no],
+            "degree":           round(tpos.degree_in_sign, 2),
+            "house_from_lagna": house_from_lagna,
+            "house_from_moon":  house_from_moon,
+            "tags":             tags,
+        })
+    result["transits"] = {
+        "date": "20 มิ.ย. 2569",
+        "planets": transit_planets,
+    }
+
     return jsonify(result)
 
 if __name__ == "__main__":

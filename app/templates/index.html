@@ -300,6 +300,32 @@ input:focus, select:focus { border-color: var(--accent2); background: var(--surf
   opacity: .85;
 }
 
+/* ─── Transit (ดาวย้าย) ──────────────────────────────── */
+.transit-grid { display: flex; flex-direction: column; gap: 6px; }
+.transit-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 10px 12px; border-radius: 8px;
+  border: 1px solid transparent;
+  transition: background .1s;
+}
+.transit-row:hover { background: var(--surface); }
+.transit-row.significant { background: var(--surface); border-color: var(--border); }
+.transit-planet { font-weight: 500; min-width: 90px; font-size: .88rem; }
+.transit-pos { font-size: .78rem; color: var(--muted); flex: 1; line-height: 1.5; }
+.transit-pos strong { color: var(--text); font-weight: 500; }
+.transit-tags { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+.transit-tag {
+  font-size: .65rem; font-weight: 600; letter-spacing: .03em;
+  padding: 2px 7px; border-radius: 99px;
+  background: transparent; border: 1px solid currentColor; white-space: nowrap;
+}
+.transit-effect {
+  font-size: .78rem; color: var(--muted); line-height: 1.55;
+  padding: 6px 0 2px; margin-top: 4px;
+  border-top: 1px solid var(--border);
+}
+.transit-date { font-size: .72rem; color: var(--muted); margin-bottom: 10px; }
+
 /* ─── Section divider ────────────────────────────────── */
 .section { margin-top: 32px; }
 
@@ -674,6 +700,82 @@ function renderChart(data, inp) {
     return              { label: "วัยสูงอายุ",   color: "#94a3b8" };
   }
 
+  // ── ดาวย้าย ──────────────────────────────────────────
+  const TRANSIT_EFFECTS = {
+    "เสาร์คร่อมจันทร์": {
+      color: "#fb923c",
+      desc: "เสาร์ผ่านราศีจันทร์เกิด (สาเดสาติ) — ช่วง 7.5 ปีแห่งการทดสอบและเติบโต อาจมีความกดดัน ภาระหนัก แต่สร้างความแข็งแกร่งระยะยาว",
+    },
+    "พฤหัสเมตตา": {
+      color: "#fbbf24",
+      desc: "พฤหัสอยู่ในตำแหน่งดีจากจันทร์เกิด — ช่วงโชคดี โอกาสขยายตัว เหมาะลงทุน แต่งงาน หรือเริ่มโปรเจกต์ใหม่",
+    },
+    "ราหูคร่อมจันทร์": {
+      color: "#8b5cf6",
+      desc: "ราหูผ่านราศีจันทร์เกิด — ความเปลี่ยนแปลงขนาดใหญ่ โอกาสจากต่างถิ่น แนวคิดใหม่ที่ไม่คาดคิด",
+    },
+    "เกตุคร่อมจันทร์": {
+      color: "#94a3b8",
+      desc: "เกตุผ่านราศีจันทร์เกิด — ช่วงสะท้อนภายใน ปล่อยวางสิ่งเก่า สนใจจิตวิญญาณและความลึกลับ",
+    },
+  };
+
+  const HOUSE_NAMES = ["","ลัคนา","ธนะ","ปาฏิหาริย์","สุข","บุตร","ริปู","ปัตนี","มรณะ","ธรรม","กรรม","ลาภ","วยยะ"];
+
+  const TRANSIT_HOUSE_EFFECT = {
+    1: { saturn: "ท้าทาย", jupiter: "ดี", mars: "ระวัง", venus: "ดี", mercury: "ดี" },
+    2: { saturn: "ท้าทาย", jupiter: "ดี", mars: "ระวัง", venus: "ดี", mercury: "ดี" },
+    3: { saturn: "ดี",     jupiter: "พอใช้", mars: "ดี",  venus: "พอใช้", mercury: "ดี" },
+    4: { saturn: "ท้าทาย", jupiter: "ดี", mars: "ท้าทาย", venus: "ดี", mercury: "ดี" },
+    5: { saturn: "ท้าทาย", jupiter: "ดี", mars: "ท้าทาย", venus: "ดี", mercury: "ดี" },
+    6: { saturn: "ดี",     jupiter: "พอใช้", mars: "ดี",  venus: "พอใช้", mercury: "ดี" },
+    7: { saturn: "ท้าทาย", jupiter: "ดี", mars: "ท้าทาย", venus: "ดี", mercury: "ดี" },
+    8: { saturn: "ท้าทาย", jupiter: "พอใช้", mars: "ระวัง", venus: "ดี", mercury: "ดี" },
+    9: { saturn: "ท้าทาย", jupiter: "ดี", mars: "พอใช้", venus: "ดี", mercury: "ดี" },
+    10: { saturn: "ดี",    jupiter: "ดี", mars: "ดี",  venus: "ดี", mercury: "ดี" },
+    11: { saturn: "ดี",    jupiter: "ดี", mars: "ดี",  venus: "ดี", mercury: "ดี" },
+    12: { saturn: "ท้าทาย", jupiter: "พอใช้", mars: "ระวัง", venus: "พอใช้", mercury: "พอใช้" },
+  };
+  const PLANET_KEY = { 1:"sun",3:"mars",4:"mercury",5:"jupiter",6:"venus",7:"saturn" };
+  const EFFECT_COLOR = { "ดี": "#34d399", "ท้าทาย": "#f87171", "ระวัง": "#fb923c", "พอใช้": "#94a3b8" };
+
+  const transitObj = data.transits || {};
+  const transitRows = (transitObj.planets || []).map(t => {
+    const m = DASHA_MEANINGS[t.planet_id] || {};
+    const color = m.color || "var(--muted)";
+    const allTags = t.tags || [];
+    const isSignificant = allTags.length > 0;
+
+    // house effect
+    const pKey = PLANET_KEY[t.planet_id];
+    const houseEffects = TRANSIT_HOUSE_EFFECT[t.house_from_lagna] || {};
+    const effect = pKey ? houseEffects[pKey] : null;
+    const effectColor = effect ? (EFFECT_COLOR[effect] || "var(--muted)") : "var(--muted)";
+
+    const tagHtml = allTags.map(tag => {
+      const te = TRANSIT_EFFECTS[tag] || {};
+      return `<span class="transit-tag" style="color:${te.color||color}">${tag}</span>`;
+    }).join("");
+
+    const effectDesc = allTags.map(tag => {
+      const te = TRANSIT_EFFECTS[tag] || {};
+      return te.desc ? `<div class="transit-effect">${te.desc}</div>` : "";
+    }).join("");
+
+    const houseLabel = HOUSE_NAMES[t.house_from_lagna] || `ภพ${t.house_from_lagna}`;
+
+    return `<div class="transit-row${isSignificant ? " significant" : ""}">
+      <span class="transit-planet" style="color:${color}">${t.symbol} ${t.planet_th}</span>
+      <div class="transit-pos">
+        <strong>ราศี${t.sign_th}</strong> ${t.degree}°
+        <br>ภพ ${t.house_from_lagna} · ${houseLabel}
+        ${effect ? `<span style="color:${effectColor};font-size:.7rem;margin-left:4px">${effect}</span>` : ""}
+        ${effectDesc}
+      </div>
+      ${tagHtml ? `<div class="transit-tags">${tagHtml}</div>` : ""}
+    </div>`;
+  }).join("");
+
   const birthCE = inp.year;
   const dashaObj = data.dasha || {};
   const periods  = dashaObj.periods || [];
@@ -742,6 +844,11 @@ function renderChart(data, inp) {
     <div class="section">
       <h2>โยค</h2>
       <div class="yoga-list">${yogaHtml}</div>
+    </div>
+
+    <div class="section">
+      <h2>ดาวย้าย <span style="font-size:.72rem;font-weight:400;color:var(--muted)">${transitObj.date || ""}</span></h2>
+      <div class="transit-grid">${transitRows}</div>
     </div>
 
     <div class="section">
